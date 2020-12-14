@@ -154,9 +154,4 @@ func _physics_process(delta):
 		head.move_and_slide(velocity, Vector3.UP, false, 1, 1.4, false)
 
 
-func _on_Area_body_entered(body):
-	if body.name == "EggPickup":
-		print('okay')
-		has_egg = true
-		$Head/Egg.disabled = false
-		body.queue_free()
+

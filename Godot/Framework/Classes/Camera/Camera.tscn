@@ -1,0 +1,17 @@
+[gd_scene format=2]
+
+[node name="Camera" type="Spatial"]
+
+[node name="Pitch" type="Spatial" parent="."]
+transform = Transform( 1, 0, 0, 0, 0.894467, 0.447135, 0, -0.447135, 0.894467, 0, 0, 0 )
+
+[node name="Yaw" type="Spatial" parent="Pitch"]
+
+[node name="Camera" type="InterpolatedCamera" parent="Pitch/Yaw"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 40 )
+projection = 1
+current = true
+size = 16.0
+near = 0.01
+far = 8192.0
+target = NodePath("../../../..")

@@ -1,17 +1,18 @@
 [gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://Assets/Rooms/LevelTwoLayout.tscn" type="PackedScene" id=1]
-[ext_resource path="res://Framework/Classes/Snake/Snake.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Framework/Classes/EggPickup/EggPickup.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Framework/Classes/NewSnake/Snake.tscn" type="PackedScene" id=4]
 
 [node name="Game" type="Spatial"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.862822, -0.188962, 0.111016 )
 
+[node name="Snake2" parent="." instance=ExtResource( 4 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -3.49987, 0 )
+
 [node name="LevelTwoLayout" parent="." instance=ExtResource( 1 )]
-transform = Transform( 1.41421, 0, -1.41421, 0, 2, 0, 1.41421, 0, 1.41421, -20.6006, 0, 3.61223 )
+transform = Transform( 1.41421, 0, -1.41421, 0, 2, 0, 1.41421, 0, 1.41421, -17.5375, 0, 4.0557 )
 
-[node name="Snake" parent="." instance=ExtResource( 2 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.52233, -3.00074, 5.82414 )
-
-[node name="EggPickup" parent="." instance=ExtResource( 3 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.45667, 0.249163, 13.4318 )
+[node name="EggPickup" type="RigidBody" parent="." instance=ExtResource( 3 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -4.66975, -3.50085, 6.32079 )
+collision_layer = 4
