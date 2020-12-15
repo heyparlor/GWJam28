@@ -11,7 +11,7 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.862822, -0.188962, 0.111016
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -3.49987, 0 )
 
 [node name="LevelTwoLayout" parent="." instance=ExtResource( 1 )]
-transform = Transform( 1.41421, 0, -1.41421, 0, 2, 0, 1.41421, 0, 1.41421, -17.7728, 0.178608, 3.93941 )
+transform = Transform( 1.41421, 0, -1.41421, 0, 2, 0, 1.41421, 0, 1.41421, -17.5375, 0, 4.0557 )
 
 [node name="EggPickup" parent="." instance=ExtResource( 3 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -4.66975, -3.50085, 6.32079 )
