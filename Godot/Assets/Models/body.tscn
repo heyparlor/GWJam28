@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=2]
+
+[sub_resource type="SpatialMaterial" id=2]
+params_diffuse_mode = 3
+params_specular_mode = 3
+albedo_color = Color( 0.0509804, 0.960784, 0.643137, 1 )
+
+[sub_resource type="SphereMesh" id=1]
+material = SubResource( 2 )
+radial_segments = 6
+rings = 3
+
+[node name="body" type="Spatial"]
+transform = Transform( 0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0 )
+
+[node name="MeshInstance" type="MeshInstance" parent="."]
+mesh = SubResource( 1 )
+material/0 = null
