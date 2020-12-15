@@ -15,7 +15,8 @@ var dt : int = 15
 var gravity : int = 20;
 var speed : int = 5;
 var egg_timer : float = 0
-
+var camera
+var camera_angle : float = 0
 
 var has_egg : bool = false
 var in_belly : bool = false
@@ -64,8 +65,8 @@ func _ready():
 			snake.append({pos = pos_n, pos_old = pos_n, velocity = Vector3(), gravity_vec = Vector3(), joint = true, rot = Vector3() })
 			snake_segment[n].transform.origin = snake[n].pos
 		
-	# add the Camera
-	var camera = cameraNode.instance()
+	# add the Camera to the first segment
+	camera = cameraNode.instance()
 	snake_segment[0].add_child(camera)
 		
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -100,9 +101,24 @@ func _physics_process(delta):
 		egg_timer -= delta
 	else:
 		egg_timer = 0
+		
+#####################################################
+## Camera Swivel	
+#####################################################
+
+	if Input.is_action_just_pressed("swivel_left"):
+		camera_angle += 1.5708
+#		camera.rotation.y += 1 * delta
+	if Input.is_action_just_pressed("swivel_right"):
+		camera_angle -= 1.5708
+#		camera.rotation.y -= 1 * delta
+
+	camera.rotation.y = lerp(camera.rotation.y, camera_angle, delta * 3)
+
+	
 #####################################################
 ## Movement		
-#####################################################		
+#####################################################
 	# loop through our segments
 	for n in range(num_segments):
 		# keep the head attached to whatever (for testing)
@@ -135,13 +151,14 @@ func _physics_process(delta):
 				# this is the head
 				var direction = Vector3()
 				if Input.is_action_pressed("move_north"):
-					direction -= snake_segment[n].transform.basis.z
+					direction -= camera.transform.basis.z
+#					direction -= snake_segment[n].transform.basis.z
 				if Input.is_action_pressed("move_south"):
-					direction += snake_segment[n].transform.basis.z
+					direction += camera.transform.basis.z
 				if Input.is_action_pressed("move_west"):
-					direction -= snake_segment[n].transform.basis.x
+					direction -= camera.transform.basis.x
 				if Input.is_action_pressed("move_east"):
-					direction += snake_segment[n].transform.basis.x
+					direction += camera.transform.basis.x
 
 				direction = direction.normalized()
 
