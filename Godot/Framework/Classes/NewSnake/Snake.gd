@@ -3,6 +3,7 @@ extends Spatial
 # declare variables
 onready var segmentNode = preload("res://Framework/Classes/NewSnake/Segment.tscn");
 onready var cameraNode = preload("res://Framework/Classes/Camera/Camera.tscn");
+onready var eggNode = preload("res://Framework/Classes/EggPickup/EggPickup.tscn");
 var snake : Array = [];
 var snake_segment : Array = []
 var pos_start : Vector3 = Vector3();
@@ -13,12 +14,13 @@ var dt : int = 15
 
 var gravity : int = 20;
 var speed : int = 5;
+var egg_timer : float = 0
 
 
 var has_egg : bool = false
 var in_belly : bool = false
 # this variable stores which segment in which the egg sits
-var egg_belly : int = 2
+var egg_belly : int = 3
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -52,7 +54,8 @@ func _ready():
 			# check if it's on an item
 			if n == 0:
 				snake_segment[n].get_node("Area").connect("body_entered", self,"_on_Area_body_entered")
-
+				snake_segment[n].get_node("head").show()
+				snake_segment[n].get_node("body").hide()
 
 			add_child(snake_segment[n])
 			# set the position of the new segment based on the old one
@@ -67,13 +70,39 @@ func _ready():
 		
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _physics_process(delta):
-	if has_egg and not in_belly:
-		var collider = snake_segment[egg_belly].get_node("CollisionShape")
-		var mesh = snake_segment[egg_belly].get_node("MeshInstance")
-		collider.shape.radius = 1
-		mesh.mesh.radius = 1
-		mesh.mesh.height = 2
-		in_belly = true
+	if has_egg:
+		if not in_belly:
+			var collider = snake_segment[egg_belly].get_node("CollisionShape")
+			var mesh = snake_segment[egg_belly].get_node("MeshInstance")
+			var body = snake_segment[egg_belly].get_node("body")
+			collider.shape.radius = 1
+			body.scale = Vector3(1,1,1)
+			mesh.mesh.radius = 1
+			mesh.mesh.height = 2
+			in_belly = true
+		else:
+			if Input.is_action_just_released("throw_up"):
+				var egg = eggNode.instance()
+				egg.global_transform.origin = snake_segment[0].global_transform.origin
+				owner.add_child(egg)
+				has_egg = false
+				in_belly = false
+				egg_timer = 5.0
+				var collider = snake_segment[egg_belly].get_node("CollisionShape")
+				var mesh = snake_segment[egg_belly].get_node("MeshInstance")
+				var body = snake_segment[egg_belly].get_node("body")
+				collider.shape.radius = .5
+				body.scale = Vector3(.5,.5,.5)
+				mesh.mesh.radius = .5
+				mesh.mesh.height = 1
+		
+	if egg_timer > 0:
+		egg_timer -= delta
+	else:
+		egg_timer = 0
+#####################################################
+## Movement		
+#####################################################		
 	# loop through our segments
 	for n in range(num_segments):
 		# keep the head attached to whatever (for testing)
@@ -105,13 +134,13 @@ func _physics_process(delta):
 
 				# this is the head
 				var direction = Vector3()
-				if Input.is_action_pressed("ui_up"):
+				if Input.is_action_pressed("move_north"):
 					direction -= snake_segment[n].transform.basis.z
-				if Input.is_action_pressed("ui_down"):
+				if Input.is_action_pressed("move_south"):
 					direction += snake_segment[n].transform.basis.z
-				if Input.is_action_pressed("ui_left"):
+				if Input.is_action_pressed("move_west"):
 					direction -= snake_segment[n].transform.basis.x
-				if Input.is_action_pressed("ui_right"):
+				if Input.is_action_pressed("move_east"):
 					direction += snake_segment[n].transform.basis.x
 
 				direction = direction.normalized()
@@ -138,12 +167,20 @@ func _physics_process(delta):
 					snake[n].velocity.x = direction_head.x * speed
 					snake[n].velocity.z = direction_head.z * speed
 			
-
+			if abs(snake[n].velocity.x) > 0.1 or abs(snake[n].velocity.z) > 0.1:
+				var look = snake_segment[n].transform.origin - snake[n].velocity
+				look.y += snake[n].velocity.y
+				snake_segment[n].get_node("MeshInstance").look_at(look, Vector3.UP)
+				
+			var finalRot = snake_segment[n].get_node("MeshInstance").rotation_degrees
+			
+			snake_segment[n].get_node("head").rotation_degrees = lerp(snake_segment[n].get_node("head").rotation_degrees, finalRot, delta*10)
+			snake_segment[n].get_node("body").rotation_degrees = snake_segment[n].get_node("head").rotation_degrees
 			
 			# prevent movement if we get stuck (egg in belly)
 			if n < num_segments-1:
 				if distance_tail > segment_spacing.max+1.0:
-					snake[n].velocity = direction_tail * speed
+					snake[n].velocity = direction_tail * speed * 4
 					
 				
 			snake_segment[n].move_and_slide(snake[n].velocity, Vector3.UP, false, 1, 1.4, false)
@@ -153,7 +190,10 @@ func _physics_process(delta):
 			
 func _on_Area_body_entered(body):
 	if body.name == "EggPickup":
-		print('got the egg')
-		has_egg = true
-		body.queue_free()
+		# I added a cooldown timer here so the egg isn't picked up immediately 
+		# after the snake throws it up
+		if egg_timer == 0:
+			print('got the egg')
+			has_egg = true
+			body.queue_free()
 #
