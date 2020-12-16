@@ -57,10 +57,11 @@ func _ready():
 				snake_segment[n].get_node("Area").connect("body_entered", self,"_on_Area_body_entered")
 				snake_segment[n].get_node("head").show()
 				snake_segment[n].get_node("body").hide()
-
+				snake_segment[n].name = "Head"
 			add_child(snake_segment[n])
 			# set the position of the new segment based on the old one
-			var pos_n = Vector3(pos_start.x+size_segment_radius * n, pos_start.y, pos_start.z+size_segment_radius * n)
+#			var pos_n = Vector3(pos_start.x+size_segment_radius * n, pos_start.y, pos_start.z+size_segment_radius * n)
+			var pos_n = Vector3(pos_start.x, pos_start.y, pos_start.z)
 			# store details for this segment in the snake array
 			snake.append({pos = pos_n, pos_old = pos_n, velocity = Vector3(), gravity_vec = Vector3(), joint = true, rot = Vector3() })
 			snake_segment[n].transform.origin = snake[n].pos
@@ -190,16 +191,17 @@ func _physics_process(delta):
 				snake_segment[n].get_node("MeshInstance").look_at(look, Vector3.UP)
 				
 			var finalRot = snake_segment[n].get_node("MeshInstance").rotation_degrees
-			
+			finalRot.x = 45
+			finalRot.z = 0
 			snake_segment[n].get_node("head").rotation_degrees = lerp(snake_segment[n].get_node("head").rotation_degrees, finalRot, delta*10)
 			snake_segment[n].get_node("body").rotation_degrees = snake_segment[n].get_node("head").rotation_degrees
-			
 			# prevent movement if we get stuck (egg in belly)
 			if n < num_segments-1:
 				if distance_tail > segment_spacing.max+1.0:
 					snake[n].velocity = direction_tail * speed * 4
-					
 				
+#			print( snake_segment[n].get_node("head").rotation_degrees )	
+					
 			snake_segment[n].move_and_slide(snake[n].velocity, Vector3.UP, false, 1, 1.4, false)
 			
 			snake[n].pos = snake_segment[n].global_transform.origin
